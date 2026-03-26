@@ -4,7 +4,11 @@ import requests
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = os.getenv("MODEL", "openrouter/mistral")
+
+MODEL = os.getenv(
+    "MODEL",
+    "mistralai/mistral-7b-instruct"
+)
 
 
 def ask_ai(text):
@@ -15,18 +19,28 @@ def ask_ai(text):
     headers = {
         "Authorization": f"Bearer {KEY}",
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://railway.app",
+        "X-Title": "telegram-bot"
     }
 
     data = {
         "model": MODEL,
         "messages": [
-            {"role": "user", "content": text}
-        ],
+            {
+                "role": "user",
+                "content": text
+            }
+        ]
     }
 
     try:
 
-        r = requests.post(API, headers=headers, json=data, timeout=30)
+        r = requests.post(
+            API,
+            headers=headers,
+            json=data,
+            timeout=30
+        )
 
         print(r.text)
 
@@ -38,5 +52,4 @@ def ask_ai(text):
         return j["choices"][0]["message"]["content"]
 
     except Exception as e:
-
         return str(e)
