@@ -15,7 +15,7 @@ def ask_llm(messages):
         "Authorization": f"Bearer {KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://railway.app",
-        "X-Title": "agent"
+        "X-Title": "openclaw-agent"
     }
 
     data = {
