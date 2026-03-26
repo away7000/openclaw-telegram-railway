@@ -1,6 +1,8 @@
 import os
 import requests
 
+from agent.functions import functions
+
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 KEY = os.getenv("OPENROUTER_API_KEY")
@@ -13,17 +15,18 @@ def ask_llm(messages):
         "Authorization": f"Bearer {KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://railway.app",
-        "X-Title": "openclaw-agent"
+        "X-Title": "agent"
     }
 
     data = {
         "model": MODEL,
-        "messages": messages
+        "messages": messages,
+        "tools": functions,
+        "tool_choice": "auto"
     }
 
     r = requests.post(API, headers=headers, json=data)
 
-    if r.status_code != 200:
-        return r.text
+    print(r.text)
 
-    return r.json()["choices"][0]["message"]["content"]
+    return r.json()
