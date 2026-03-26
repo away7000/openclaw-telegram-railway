@@ -1,14 +1,9 @@
-from agent.memory import add, get
-from agent.tools import run_tool
 from agent.llm import ask_llm
+from agent.tools import call_function
+from agent.memory import add, get
 
 
 def run_agent(user, text):
-
-    tool = run_tool(text)
-
-    if tool:
-        return tool
 
     add(user, text)
 
@@ -22,7 +17,36 @@ def run_agent(user, text):
             "content": m
         })
 
-    reply = ask_llm(messages)
+    r = ask_llm(messages)
+
+    msg = r["choices"][0]["message"]
+
+    # ✅ LLM call function
+    if "tool_calls" in msg:
+
+        call = msg["tool_calls"][0]
+
+        name = call["function"]["name"]
+
+        args = call["function"].get("arguments", {})
+
+        result = call_function(name, args)
+
+        messages.append(msg)
+
+        messages.append({
+            "role": "tool",
+            "name": name,
+            "content": result
+        })
+
+        r2 = ask_llm(messages)
+
+        reply = r2["choices"][0]["message"]["content"]
+
+    else:
+
+        reply = msg["content"]
 
     add(user, reply)
 
