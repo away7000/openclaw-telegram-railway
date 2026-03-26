@@ -4,10 +4,13 @@ import requests
 API = "https://openrouter.ai/api/v1/chat/completions"
 
 KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = os.getenv("MODEL")
+MODEL = os.getenv("MODEL", "openrouter/mistral")
 
 
 def ask_ai(text):
+
+    if not KEY:
+        return "No API key"
 
     headers = {
         "Authorization": f"Bearer {KEY}",
@@ -21,9 +24,19 @@ def ask_ai(text):
         ],
     }
 
-    r = requests.post(API, headers=headers, json=data)
+    try:
 
-    if r.status_code != 200:
-        return "AI error"
+        r = requests.post(API, headers=headers, json=data, timeout=30)
 
-    return r.json()["choices"][0]["message"]["content"]
+        print(r.text)
+
+        if r.status_code != 200:
+            return f"API error {r.status_code}"
+
+        j = r.json()
+
+        return j["choices"][0]["message"]["content"]
+
+    except Exception as e:
+
+        return str(e)
