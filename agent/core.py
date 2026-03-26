@@ -3,13 +3,30 @@ from agent.tools import call_function
 from agent.memory import add, get
 
 
+def load_skill():
+
+    try:
+        with open("skill.md", "r") as f:
+            return f.read()
+    except:
+        return ""
+
+
 def run_agent(user, text):
+
+    skill = load_skill()
 
     add(user, text)
 
     mem = get(user)
 
     messages = []
+
+    # ✅ system skill
+    messages.append({
+        "role": "system",
+        "content": skill
+    })
 
     for m in mem:
         messages.append({
@@ -21,7 +38,6 @@ def run_agent(user, text):
 
     msg = r["choices"][0]["message"]
 
-    # ✅ LLM call function
     if "tool_calls" in msg:
 
         call = msg["tool_calls"][0]
@@ -51,11 +67,3 @@ def run_agent(user, text):
     add(user, reply)
 
     return reply
-    
-def load_skill():
-
-    try:
-        with open("skill.md", "r") as f:
-            return f.read()
-    except:
-        return ""
