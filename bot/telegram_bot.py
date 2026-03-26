@@ -1,15 +1,9 @@
 import os
 
 from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder,
-    MessageHandler,
-    ContextTypes,
-    filters,
-)
+from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 
 from ai.llm import ask_ai
-
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
