@@ -1,7 +1,7 @@
 functions = [
     {
         "name": "get_time",
-        "description": "Get current server time",
+        "description": "Get server time",
         "parameters": {
             "type": "object",
             "properties": {}
