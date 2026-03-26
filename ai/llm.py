@@ -7,7 +7,7 @@ KEY = os.getenv("OPENROUTER_API_KEY")
 
 MODEL = os.getenv(
     "MODEL",
-    "mistralai/mistral-7b-instruct"
+    "deepseek/deepseek-chat"
 )
 
 
@@ -20,7 +20,7 @@ def ask_ai(text):
         "Authorization": f"Bearer {KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://railway.app",
-        "X-Title": "telegram-bot"
+        "X-Title": "railway-bot"
     }
 
     data = {
@@ -30,7 +30,8 @@ def ask_ai(text):
                 "role": "user",
                 "content": text
             }
-        ]
+        ],
+        "max_tokens": 500
     }
 
     try:
@@ -39,13 +40,14 @@ def ask_ai(text):
             API,
             headers=headers,
             json=data,
-            timeout=30
+            timeout=60
         )
 
-        print(r.text)
+        print("STATUS:", r.status_code)
+        print("RESP:", r.text)
 
         if r.status_code != 200:
-            return f"API error {r.status_code}"
+            return r.text
 
         j = r.json()
 
