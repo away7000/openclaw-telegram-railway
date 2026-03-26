@@ -51,3 +51,11 @@ def run_agent(user, text):
     add(user, reply)
 
     return reply
+    
+def load_skill():
+
+    try:
+        with open("skill.md", "r") as f:
+            return f.read()
+    except:
+        return ""
