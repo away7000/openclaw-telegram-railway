@@ -12,6 +12,9 @@ def load_skill():
         return ""
 
 
+MAX_STEPS = 5
+
+
 def run_agent(user, text):
 
     skill = load_skill()
@@ -22,7 +25,7 @@ def run_agent(user, text):
 
     messages = []
 
-    # ✅ system skill
+    # system prompt
     messages.append({
         "role": "system",
         "content": skill
@@ -34,36 +37,40 @@ def run_agent(user, text):
             "content": m
         })
 
-    r = ask_llm(messages)
+    for step in range(MAX_STEPS):
 
-    msg = r["choices"][0]["message"]
+        r = ask_llm(messages)
 
-    if "tool_calls" in msg:
-
-        call = msg["tool_calls"][0]
-
-        name = call["function"]["name"]
-
-        args = call["function"].get("arguments", {})
-
-        result = call_function(name, args)
+        msg = r["choices"][0]["message"]
 
         messages.append(msg)
 
-        messages.append({
-            "role": "tool",
-            "name": name,
-            "content": result
-        })
+        # ✅ TOOL CALL
+        if "tool_calls" in msg:
 
-        r2 = ask_llm(messages)
+            call = msg["tool_calls"][0]
 
-        reply = r2["choices"][0]["message"]["content"]
+            name = call["function"]["name"]
 
-    else:
+            args = call["function"].get("arguments", {})
 
-        reply = msg["content"]
+            result = call_function(name, args)
 
-    add(user, reply)
+            messages.append({
+                "role": "tool",
+                "tool_name": name,
+                "content": str(result)
+            })
 
-    return reply
+            continue
+
+        # ✅ FINAL ANSWER
+        if "content" in msg and msg["content"]:
+
+            reply = msg["content"]
+
+            add(user, reply)
+
+            return reply
+
+    return "Agent stopped"
