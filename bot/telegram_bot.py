@@ -5,6 +5,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filte
 
 from ai.llm import ask_ai
 
+
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 
@@ -20,7 +21,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(reply)
 
 
-async def start_bot():
+def start_bot():
 
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -30,4 +31,4 @@ async def start_bot():
 
     print("BOT STARTED")
 
-    await app.run_polling()
+    app.run_polling()
