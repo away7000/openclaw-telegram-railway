@@ -1,28 +1,27 @@
 import os
-from telegram.ext import Updater, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
 from ai.llm import ask_ai
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 
-def handle(update, ctx):
+async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = update.message.text
 
     reply = ask_ai(text)
 
-    update.message.reply_text(reply)
+    await update.message.reply_text(reply)
 
 
-def start():
+async def start_bot():
 
-    up = Updater(TOKEN)
+    app = ApplicationBuilder().token(TOKEN).build()
 
-    dp = up.dispatcher
+    app.add_handler(MessageHandler(filters.TEXT, handle))
 
-    dp.add_handler(MessageHandler(Filters.text, handle))
+    print("BOT START")
 
-    up.start_polling()
-
-    up.idle()
+    await app.run_polling()
